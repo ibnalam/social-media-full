@@ -19,6 +19,9 @@ app.use(router)
 const {connect} = require("./database/bdConfig")
 connect()
 
+// jsom formate impliment here 
+app.use(express.json())
+
 
 
 
