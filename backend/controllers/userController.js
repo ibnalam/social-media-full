@@ -3,13 +3,15 @@ const {velidateEmail} = require("../helpers/validation.js")
 const {validateLength} = require("../helpers/validateLengthName.js")
 const {validateUserName} = require("../helpers/userName.js")
 const {jwtoken} = require("../helpers/token.js")
+const jwt = require("jsonwebtoken")
 
 
 
 const bcrypt = require('bcrypt');
+const { sendVarifiedEmail } = require("../helpers/mailer.js")
 
 
-const userController = async (req,res) =>{
+exports.userController = async (req,res) =>{
   try {
     const {
       fName,
@@ -89,12 +91,26 @@ const userController = async (req,res) =>{
       varified
     }).save()
 
-    const emailToken = jwtoken({ id: user._id.toString()}, "30m")                                  
+    const emailToken = jwtoken({ id: user._id.toString()}, "30m")            
+    
+    const url = `${process.env.BASE_URL}/activate/${emailToken}`
+    sendVarifiedEmail(user.email,user.fName,url)
+
+    const token = jwtoken({ id: user._id.toString()}, "7d")  
 
     // console.log(emailToken);
 
 
-    res.send(user)
+    res.send({
+      id: user._id,
+      username: user.userName,
+      profilePicture: user.profilePicture,
+      fName: user.fName,
+      lName: user.lName,
+      token: token,
+      varified: user.varified,
+      massage: "Registration Success, Please activate your email for start"
+    })
 
 
   }
@@ -105,5 +121,76 @@ const userController = async (req,res) =>{
   }
 }
 
-module.exports = userController
+
+
+
+
+exports.activateVerifiedUser = async (req, res)=>{
+  try{
+    const {token} = req.body
+   
+    const user = jwt.verify(token, process.env.SECRET_TOCKEN)
+    const check = await Users.findById(user.id)
+    
+
+    if(check.varified === true){
+      return res.status(401).json({
+        massage: "This Email is already verifyed"
+      })
+    }else {
+      await Users.findByIdAndUpdate(user.id,{varified: true})
+      return res.status(200).json({
+        massage: "Account has beeen activated Successfull"
+      })
+    }
+  }
+  catch(err){
+    res.status(400).json({
+      massage: err.massage
+    })
+  }
+}
+
+
+
+
+exports.login = async (req, res) => {
+  try{
+    const {email, password} = req.body
+    const user = await Users.findOne({email})
+    if(!user){
+      return  res.status(400).json({
+        massage: "The Email Address you entired is not aconnected to an account "
+      })
+    }
+    const check = await bcrypt.compare(password, user.password)
+    if(!check){
+     return res.status(400).json({
+        massage: "Invalid credintial error , Plase try again"
+      })
+    }
+    const token = jwtoken({ id: user._id.toString()}, "7d")  
+
+    res.send({
+      id: user._id,
+      username: user.userName,
+      profilePicture: user.profilePicture,
+      fName: user.fName,
+      lName: user.lName,
+      token: token,
+      varified: user.varified,
+      massage: "Log In  Success"
+    })
+    
+  }catch(error) {
+    res.status(400).json({
+      massage: error.massage
+    })
+  }
+}
+
+
+
+
+
 
