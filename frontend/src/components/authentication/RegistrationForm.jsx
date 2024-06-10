@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useFormik } from 'formik'
+import { signUp } from '../../validations'
 
 const initialState = {
     fName: "",
@@ -11,22 +12,25 @@ const initialState = {
     bMonth: "",
     bDay: "",
     gender: "",
-
 }
+
 
 const RegistrationForm = () => {
     const formik = useFormik({
        initialValues: initialState,
-    //    validationSchema
+       validationSchema: signUp,
     onSubmit: () =>{
         console.log("hello sign up");
     }
     });
 
-    console.log(formik)
+    const {errors,touched} = formik;
+    // console.log(errors)
+
+    // console.log(formik)
 
   return (
-    <div className='w-full rounded-md shadow-md px-11 py-7 box-border'>
+    <div className='w-full rounded-md shadow-md p-4 lg:px-11 lg:py-7 box-border border border-line_color lg:border-none'>
         <div>
             <form 
             onSubmit={formik.handleSubmit}>
@@ -34,7 +38,9 @@ const RegistrationForm = () => {
                 {/* first name input  */}
                 <input 
                 value={formik.values.fName}
-                className='w-full px-4 py-2 border border-line_color rounded-md mb-5 focus:outline-none' 
+                className={errors.fName && touched.fName 
+                    ? 'w-full px-4 py-2 border border-line_color rounded-md focus:outline-none' 
+                    : 'w-full px-4 py-2 border border-line_color rounded-md mb-5 focus:outline-none'} 
                 type="text" 
                 placeholder='First Name'
                 onChange={formik.handleChange}
@@ -42,11 +48,20 @@ const RegistrationForm = () => {
                 onBlur={formik.handleBlur}
                 name='fName'
                 />
+                {
+                    errors.fName && touched.fName && (
+                        <p className=' font-normal text-red text-sm my-2  '>{errors.fName}</p>
+                    ) 
+                }
+
+
 
 
                 {/* last name input  */}
                 <input 
-                className='w-full px-4 py-2 border border-line_color rounded-md mb-5 focus:outline-none' 
+                className={errors.lName && touched.lName 
+                    ? 'w-full px-4 py-2 border border-line_color rounded-md focus:outline-none' 
+                    : 'w-full px-4 py-2 border border-line_color rounded-md mb-5 focus:outline-none'} 
                 type="text" 
                 value={formik.values.lName}
                 placeholder='Last Name'
@@ -55,11 +70,18 @@ const RegistrationForm = () => {
                 onBlur={formik.handleBlur}
                 name='lName'
                 />
+                {
+                    errors.lName && touched.lName && (
+                        <p className=' font-normal text-red text-sm my-2  '>{errors.lName}</p>
+                    )
+                }
 
 
                 {/* email input here  */}
                 <input 
-                className='w-full px-4 py-2 border border-line_color rounded-md mb-5 focus:outline-none' 
+                className={errors.email && touched.email
+                    ? 'w-full px-4 py-2 border border-line_color rounded-md focus:outline-none' 
+                    : 'w-full px-4 py-2 border border-line_color rounded-md mb-5 focus:outline-none'} 
                 type="email" 
                 value={formik.values.email}
                 placeholder='example@gmail.com'
@@ -68,11 +90,18 @@ const RegistrationForm = () => {
                 onBlur={formik.handleBlur}
                 name='email'
                 />
+                 {
+                    errors.email && touched.email && (
+                        <p className=' font-normal text-red text-sm my-2  '>{errors.email}</p>
+                    )
+                }
 
 
                 {/* password input here  */}
                 <input 
-                className='w-full px-4 py-2 border border-line_color rounded-md mb-5 focus:outline-none' 
+                className={errors.password && touched.password
+                    ? 'w-full px-4 py-2 border border-line_color rounded-md focus:outline-none' 
+                    : 'w-full px-4 py-2 border border-line_color rounded-md mb-5 focus:outline-none'} 
                 type="password" 
                 value={formik.values.password}
                 placeholder='password'
@@ -81,6 +110,12 @@ const RegistrationForm = () => {
                 onBlur={formik.handleBlur}
                 name='password'
                 />
+                {
+                    errors.password && touched.password && (
+                        <p className=' font-normal text-red text-sm my-2  '>{errors.password}</p>
+                    )
+                }
+
 
 
                 {/* gender input here  */}
@@ -116,6 +151,12 @@ const RegistrationForm = () => {
                 value="custom"
                 className='mb-6 ml-6'/>
                 <label htmlFor="Custom" className='font-normal ml-1'>Custom</label>
+
+                {
+                    errors.gender && touched.gender && (
+                        <p className=' font-normal text-red text-sm my-2  '>{errors.gender}</p>
+                    )
+                }
 
 
 
@@ -168,9 +209,9 @@ const RegistrationForm = () => {
 
                 {/* button + sign up here */}
                </div>
-               <div className='flex justify-between items-center'>
-               <button type='submit' className='px-6 py-2 bg-secondary_bg rounded-full text-white font-normal'>Submit</button>
-               <p className='font-normal text-lg'>Already Have An Account? <Link className=' text-primary_color font-bold' to="/">Sign In</Link></p>
+               <div className='lg:flex justify-between items-center '>
+                    <button type='submit' className='px-6 py-2 bg-secondary_bg rounded-full text-white font-normal'>Submit</button>
+                    <p className='font-normal text-lg'>Already Have An Account? <Link className=' text-primary_color font-bold' to="/">Sign In</Link></p>
                </div>
             </form>
         </div>
